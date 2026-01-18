@@ -1,11 +1,15 @@
 from fastapi import FastAPI,Request
+import logging
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers.rankings import router as rankings_router
 from app.routers.health import router as health_router
 from app.exceptions import RankingsAPIError
 
-
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 
 app = FastAPI()
 
@@ -38,3 +42,4 @@ async def rankings_api_error_handler(request: Request, exc: RankingsAPIError):
                  "detail": exc.message,
                  "args": exc.args},
     )
+

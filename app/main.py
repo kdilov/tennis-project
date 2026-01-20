@@ -44,6 +44,6 @@ async def rankings_api_error_handler(request: Request, exc: RankingsAPIError):
                  "args": exc.args},
     )
 
-handler = Mangum(app)
+handler = Mangum(app, api_gateway_base_path="/prod")
 
 

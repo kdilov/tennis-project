@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 async def get_live_rankings() -> RankingsResponse:
 
-     # Check cache first
+    # Check cache first
     cached = get_cached_rankings()
     if cached is not None:
         logger.info("Returning cached rankings")

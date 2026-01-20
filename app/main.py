@@ -45,3 +45,5 @@ async def rankings_api_error_handler(request: Request, exc: RankingsAPIError):
     )
 
 handler = Mangum(app)
+
+

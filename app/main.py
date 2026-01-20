@@ -20,6 +20,7 @@ allowed_origins = [
     "http://127.0.0.1:3000", 
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://tennis-rankings-frontend.s3-website.eu-west-2.amazonaws.com",
     
 
 ]

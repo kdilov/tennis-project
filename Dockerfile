@@ -15,7 +15,7 @@ COPY pyproject.toml uv.lock ./
 
 # Install dependencies using uv
 
-RUN uv sync --frozen
+RUN uv sync --frozen --system
 
 # Copy the rest of your application code
 
@@ -28,4 +28,4 @@ EXPOSE 8003
 # Hint: use "uv run python -m uvicorn app.main:app --host 0.0.0.0 --port 8000"
 # The --host 0.0.0.0 is important - it allows connections from outside the container
 
-CMD ["uv", "run","python","-m","uvicorn",  "app.main:app","--host","0.0.0.0", "--port", "8003"]
+CMD ["uv", "run","python","-m","uvicorn",  "app.main:app","--host","0.0.0.0", "--port", "8080"]

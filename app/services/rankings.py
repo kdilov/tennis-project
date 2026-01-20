@@ -2,6 +2,7 @@ import httpx
 import logging
 from app.models.player import RankingsResponse
 from app.exceptions import RankingsAPIError
+from app.cache import get_cached_rankings,set_cached_rankings
 from httpx import HTTPStatusError
 from app.config import settings
 
@@ -9,6 +10,12 @@ logger = logging.getLogger(__name__)
 
 
 async def get_live_rankings() -> RankingsResponse:
+
+     # Check cache first
+    cached = get_cached_rankings()
+    if cached is not None:
+        logger.info("Returning cached rankings")
+        return cached
     
     url = "https://tennisapi1.p.rapidapi.com/api/tennis/rankings/atp/live"
     headers = {
@@ -25,7 +32,7 @@ async def get_live_rankings() -> RankingsResponse:
                 r.raise_for_status()
                 api_data = RankingsResponse.model_validate(r.json())  
                 logger.info(f"Successfully fetched {len(api_data.rankings)} players")
-
+                set_cached_rankings(api_data)
         return api_data
     
     except HTTPStatusError as e:

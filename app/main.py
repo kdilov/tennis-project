@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers.rankings import router as rankings_router
 from app.routers.health import router as health_router
 from app.exceptions import RankingsAPIError
+from mangum import Mangum
 
 logging.basicConfig(
     level=logging.INFO,
@@ -43,3 +44,4 @@ async def rankings_api_error_handler(request: Request, exc: RankingsAPIError):
                  "args": exc.args},
     )
 
+handler = Mangum(app)

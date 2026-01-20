@@ -15,16 +15,45 @@ jobs:
     
     steps:
       - uses: actions/checkout@v5
+      
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.13'
+      
       - name: Install uv
         run: pip install uv 
+      
       - name: Install dependencies
         run: uv sync
+      
       - name: Run tests
         run: uv run pytest
 
-  
-    
+      - name: Configure AWS credentials
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-2
+
+      - name: Log in to Amazon ECR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push image to ECR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          docker build -f Dockerfile.lambda -t tennis-rankings-api .
+          docker tag tennis-rankings-api:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-west-2.amazonaws.com/tennis-rankings-api:latest
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-west-2.amazonaws.com/tennis-rankings-api:latest
+
+      - name: Update Lambda function
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          aws lambda update-function-code \
+            --function-name tennis-rankings-api \
+            --image-uri ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-west-2.amazonaws.com/tennis-rankings-api:latest \
+            --region eu-west-2

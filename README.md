@@ -67,6 +67,33 @@ RAPIDAPI_KEY=your_key
 RAPIDAPI_HOST=tennisapi1.p.rapidapi.com
 ```
 
+#### Optional: alternative rankings provider
+
+`/rankings` can be served from [Live Tennis API](https://livetennisapi.com)
+instead. This is off by default — with nothing below set, the provider above is
+used exactly as before.
+
+```
+RANKINGS_PROVIDER=livetennisapi
+LIVETENNISAPI_KEY=your_key
+```
+
+Optional, with the defaults shown:
+
+```
+LIVETENNISAPI_BASE_URL=https://api.livetennisapi.com/api/public/v1
+LIVETENNISAPI_SYSTEM=atp      # atp, wta, itf_jt, itf_mt, itf_wt
+LIVETENNISAPI_LIMIT=50
+```
+
+The response shape is unchanged, so the frontend needs no edit. Two notes:
+
+- The ranking table is a PRO-tier endpoint there; player lookups used to fill in
+  names are free.
+- A ranking record carries no player name, so one `/players/{id}` call is made
+  per player on a cache miss (the cache TTL is 1 hour). If a future response
+  embeds the player, that lookup is skipped automatically.
+
 ### Frontend
 
 ```bash
@@ -92,7 +119,8 @@ tennis-project/
 │   │   ├── rankings.py      # Rankings endpoints
 │   │   └── health.py        # Health check endpoint
 │   └── services/
-│       └── rankings.py      # Business logic
+│       ├── rankings.py      # Business logic
+│       └── livetennisapi.py # Optional alternative provider
 ├── tests/
 ├── Dockerfile               # Local development
 ├── Dockerfile.lambda        # AWS Lambda deployment

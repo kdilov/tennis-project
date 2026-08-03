@@ -16,7 +16,15 @@ async def get_live_rankings() -> RankingsResponse:
     if cached is not None:
         logger.info("Returning cached rankings")
         return cached
-    
+
+    if settings.rankings_provider == "livetennisapi":
+        # Imported here so the default path does not depend on this module.
+        from app.services.livetennisapi import get_livetennisapi_rankings
+
+        api_data = await get_livetennisapi_rankings()
+        set_cached_rankings(api_data)
+        return api_data
+
     url = "https://tennisapi1.p.rapidapi.com/api/tennis/rankings/atp/live"
     headers = {
 	"x-rapidapi-key": settings.rapidapi_key,
